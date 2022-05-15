@@ -3,7 +3,7 @@
 ** Cityname
 Requests at
 
-/<cityname> [where cityname can be kathmandu, bharatpur, lalitpur]
+/<cityname> [where cityname can be kathmandu, bharatpur, lalitpur, dhangadi, biratnagar, birgunj, pokhara]
 
 for more cities or general usecase see url method
 
