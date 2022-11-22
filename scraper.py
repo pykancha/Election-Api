@@ -4,9 +4,10 @@ Contains:
     kantipur_daily_extractor(): Gives list of news dicts
 """
 import json
-from bs4 import BeautifulSoup as BS
-import requests
 from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup as BS
 
 parser = "lxml"
 
@@ -27,21 +28,38 @@ def setup(url):
 def kantipur_election(url):
     soup = setup(url)
     counter = 0
-    news_list = []
+    results = dict()
     from pprint import pprint
-    for article in soup.find_all("div", class_="candidate-meta-wrapper"):
-         name = article.find('div', class_='candidate-name').text
-         party = article.find('div', class_='candidate-party-name').text
-         vote_no = article.find('div', class_='vote-numbers').text
-         data_dict = {
-            "candidate-name": name,
-            "candidate-party-name": party,
-            "vote-numbers": vote_no,
-         }
-         news_list.append(data_dict)
-         counter += 1
-    pprint(news_list)
-    return news_list
+
+    for article in soup.find_all("div", class_="col-md-6"):
+        constituency_name = article.find("h3", class_="card-title").text
+        constituency_name_parts = constituency_name.split(" ")
+        constituency_name_parts = [
+            i.strip().lower() for i in constituency_name_parts if i.strip() != ""
+        ]
+        constituency_no = int(constituency_name_parts[-1])
+        if constituency_no <= counter:
+            break
+        else:
+            counter = constituency_no
+        results[f"constituency : {constituency_no}"] = fetch_nominee_data(article)
+    return results
+
+
+def fetch_nominee_data(article):
+    info_list = []
+    for candidate_info in article.find_all("div", class_="candidate-wrapper"):
+        name = candidate_info.find("div", class_="nominee-name").text
+        party = candidate_info.find("div", class_="candidate-party-name").text
+        votes = candidate_info.find("div", class_="vote-count").text
+        info_list.append(
+            {
+                "name": name.strip(),
+                "party": party.strip(),
+                "votes": votes.strip(),
+            }
+        )
+    return info_list
 
 
 def format_date(raw_date):
@@ -53,7 +71,7 @@ def format_date(raw_date):
 
 
 if __name__ == "__main__":
-    with open('data.json', 'r') as rf:
+    with open("data.json", "r") as rf:
         data = json.load(rf)
         cities = data.keys()
-    kantipur_election(data['kathmandu'])
+    kantipur_election(data["kathmandu"])

@@ -1,27 +1,61 @@
 import json
-from flask import Flask, request, render_template
+import time
+
+from flask import Flask, render_template, request
+
 from scraper import kantipur_election
 
-app = Flask(__name__)  # notice that the app instance is called `app`, this is very important.
-with open('data.json', 'r') as rf:
-    data = json.load(rf)
-    cities = data.keys()
+app = Flask(__name__)
+
 
 @app.route("/")
 def home():
-   return render_template('README.html')
+    return render_template("index.html")
 
-@app.route("/<city>")
-def main(city):
-    if city not in cities:
-        return f"404, No city named '{city}'"
-    print("GOT city", city)
-    return json.dumps(kantipur_election(data[city]))
+
+@app.route("/area")
+def area():
+    name = request.args.get("name")
+    url = f"https://election.ekantipur.com/{name}?lng=eng"
+    data = kantipur_election(url)
+    return json.dumps(data)
+
 
 @app.route("/url/")
-def other():
-    url = request.args.get('url')
+def url():
+    url = request.args.get("url")
     print("Got url", url)
-    if not url:
-       return "Please, send 'url' as request argument"
-    return json.dumps(kantipur_election(url))
+    data = kantipur_election(url)
+    return json.dumps(data)
+
+
+@app.route("/bulk")
+def bulk():
+    list_ = request.args.get("list")
+    areas = list_.split(",")
+    all_data = {}
+    for area in areas:
+        url = f"https://election.ekantipur.com/{area}?lng=eng"
+        print("Requesting", url)
+        data = kantipur_election(url)
+        _, district = parse_area(area)
+        all_data[district] = data
+        time.sleep(1)
+    return json.dumps(all_data)
+
+
+def parse_area(area):
+    area_parts = area.split("-")
+    print(":: Area parsing", area_parts)
+    state_no, district = area_parts[1], area_parts[-1]
+    return state_no, district
+
+
+@app.route("/summary")
+def summary():
+    temp = {}
+    return json.dumps(temp)
+
+
+if __name__ == "__main__":
+    app.run(port=8090)
