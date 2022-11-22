@@ -3,7 +3,7 @@ import time
 
 from flask import Flask, render_template, request
 
-from scraper import kantipur_election
+from scraper import fetch_summary, kantipur_election
 
 app = Flask(__name__)
 
@@ -53,8 +53,9 @@ def parse_area(area):
 
 @app.route("/summary")
 def summary():
-    temp = {}
-    return json.dumps(temp)
+    url = f"https://election.ekantipur.com?lng=eng"
+    data = fetch_summary(url)
+    return json.dumps(data)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,3 @@
-"""
-Script to scrape news from www.kantipurdaily.com/news
-Contains:
-    kantipur_daily_extractor(): Gives list of news dicts
-"""
 import json
 from datetime import datetime
 
@@ -29,7 +24,6 @@ def kantipur_election(url):
     soup = setup(url)
     counter = 0
     results = dict()
-    from pprint import pprint
 
     for article in soup.find_all("div", class_="col-md-6"):
         constituency_name = article.find("h3", class_="card-title").text
@@ -60,6 +54,25 @@ def fetch_nominee_data(article):
             }
         )
     return info_list
+
+
+def fetch_summary(url):
+    soup = setup(url)
+    results = dict()
+
+    element = soup.find("div", class_="parties")
+    for el in element.find_all("div", class_="col-md-6"):
+        level_name = el.find("h2", class_="title").text.strip()
+        level_name = level_name.split(" ")[0].strip().lower()
+        level_data = []
+        for e in el.find_all("div", class_="row--border"):
+            party = e.find("div", class_="party-name").text.strip()
+            nums = e.find_all("div", class_="number-display")
+            wins = nums[0].text.strip()
+            leads = nums[1].text.strip()
+            level_data.append(dict(name=party, wins=wins, leads=leads))
+        results[level_name] = level_data
+    return results
 
 
 def format_date(raw_date):
