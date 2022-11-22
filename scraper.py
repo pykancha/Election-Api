@@ -42,6 +42,9 @@ def kantipur_election(url):
 
 def fetch_nominee_data(article):
     info_list = []
+
+    card_text = article.find("div", class_="win-lead-text").text
+    has_won = "won with" in card_text
     for candidate_info in article.find_all("div", class_="candidate-wrapper"):
         name = candidate_info.find("div", class_="nominee-name").text
         party = candidate_info.find("div", class_="candidate-party-name").text
@@ -51,6 +54,7 @@ def fetch_nominee_data(article):
                 "name": name.strip(),
                 "party": party.strip(),
                 "votes": votes.strip(),
+                "winner_declared": has_won,
             }
         )
     return info_list
