@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from pprint import pprint
 
 import requests
 from bs4 import BeautifulSoup as BS
@@ -76,6 +77,20 @@ def fetch_summary(url):
             leads = nums[1].text.strip()
             level_data.append(dict(name=party, wins=wins, leads=leads))
         results[level_name] = level_data
+    return results
+
+
+def fetch_pr(url):
+    soup = setup(url)
+    results = []
+
+    element = soup.find("div", class_="samanupatik-content")
+    for el in element.find_all("div", class_="g-2"):
+        party_name = el.find("a", class_="legend-pn").text.strip()
+        votes = el.find_all("div", class_="col-auto")[-1].text.strip()
+        print(party_name, votes)
+        results.append(dict(party=party_name, votes=votes))
+
     return results
 
 
