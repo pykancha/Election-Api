@@ -89,7 +89,7 @@ def fetch_pr(url):
         party_name = el.find("a", class_="legend-pn").text.strip()
         votes = el.find_all("div", class_="col-auto")[-1].text.strip()
         print(party_name, votes)
-        results.append(dict(party=party_name, votes=votes))
+        results.append(dict(name=party_name, votes=votes))
 
     return results
 
