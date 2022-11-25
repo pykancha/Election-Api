@@ -84,11 +84,10 @@ def fetch_pr(url):
     soup = setup(url)
     results = []
 
-    element = soup.find("div", class_="samanupatik-content")
+    element = soup.find("div", class_="fix-height-samanu")
     for el in element.find_all("div", class_="g-2"):
         party_name = el.find("a", class_="legend-pn").text.strip()
         votes = el.find_all("div", class_="col-auto")[-1].text.strip()
-        print(party_name, votes)
         results.append(dict(name=party_name, votes=votes))
 
     return results

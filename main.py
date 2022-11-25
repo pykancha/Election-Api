@@ -60,7 +60,7 @@ def summary():
 
 @app.route("/pr")
 def pr():
-    url = "https://election.ekantipur.com?lng=eng"
+    url = "https://election.ekantipur.com/samanupatik?lng=eng"
     data = fetch_pr(url)
     return json.dumps(data)
 
